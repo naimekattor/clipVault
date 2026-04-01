@@ -86,6 +86,29 @@ fn get_clipboard_now() -> Result<String, String> {
     clipboard.get_text().map_err(|e| e.to_string())
 }
 
+#[tauri::command]
+fn save_image_clip(base64_data: String, state: State<AppState>) -> Result<ClipItem, String> {
+    let db = state.db.lock().map_err(|e| e.to_string())?;
+    let now = chrono::Local::now().format("%Y-%m-%d %H:%M:%S").to_string();
+
+    db.execute(
+        "INSERT INTO clips (content, content_type, created_at, pinned)
+         VALUES (?1, 'image', ?2, 0)",
+        rusqlite::params![base64_data, now],
+    )
+    .map_err(|e| e.to_string())?;
+
+    let id = db.last_insert_rowid();
+
+    Ok(ClipItem {
+        id,
+        content: base64_data,
+        content_type: "image".to_string(),
+        created_at: now,
+        pinned: false,
+    })
+}
+
 // ── Tauri commands ────────────────────────────────────────────
 
 #[tauri::command]
@@ -240,6 +263,7 @@ pub fn run() {
         })
         .invoke_handler(tauri::generate_handler![
             save_clip,
+            save_image_clip,
             get_clips,
             delete_clip,
             toggle_pin,

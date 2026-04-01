@@ -61,7 +61,7 @@ export default function Home() {
         if (imgData && imgData !== lastImage) {
           lastImage = imgData;
           lastText = "";
-          await invoke("save_clip", { content: imgData });
+          await invoke("save_image_clip", { base64Data: imgData });
           loadClips(search);
           return;
         }
