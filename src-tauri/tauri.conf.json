@@ -14,7 +14,9 @@
         "title": "ClipVault",
         "width": 900,
         "height": 650,
-        "resizable": true
+        "resizable": true,
+        "decorations": true,
+        "transparent": false
       }
     ],
     "security": {
