@@ -75,9 +75,14 @@ export default function Home() {
     }
   }
 
-  async function deleteClip(id: number) {
-    await invoke("delete_clip", { id });
-    loadClips(search);
+  async function deleteClip(e: React.MouseEvent, id: number) {
+    e.stopPropagation();
+    try {
+      await invoke("delete_clip", { id });
+      loadClips(search);
+    } catch (err) {
+      console.error("Delete failed:", err);
+    }
   }
 
   async function togglePin(id: number) {
@@ -219,8 +224,8 @@ export default function Home() {
               </button>
 
               {/* delete button */}
-              <button
-                onClick={e => { e.stopPropagation(); deleteClip(clip.id); }}
+                <button
+                onClick={(e) => deleteClip(e, clip.id)}
                 style={{
                   background: "none",
                   color: "#ef4444",

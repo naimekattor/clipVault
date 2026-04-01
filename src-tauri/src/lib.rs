@@ -50,12 +50,12 @@ fn detect_type(content: &str) -> &'static str {
     if trimmed.starts_with("http://") || trimmed.starts_with("https://") {
         return "url";
     }
-    if trimmed.starts_with('#') && (trimmed.len() == 4 || trimmed.len() == 7) {
-        let hex = &trimmed[1..];
-        if hex.chars().all(|c| c.is_ascii_hexdigit()) {
-            return "color";
-        }
+
+    let hex = trimmed.trim_start_matches('#');
+    if (hex.len() == 3 || hex.len() == 6) && hex.chars().all(|c| c.is_ascii_hexdigit()) {
+        return "color";
     }
+
     if (trimmed.starts_with('{') && trimmed.ends_with('}'))
         || (trimmed.starts_with('[') && trimmed.ends_with(']'))
     {
@@ -120,10 +120,7 @@ fn save_clip(content: String, state: State<AppState>) -> Result<ClipItem, String
 }
 
 #[tauri::command]
-fn get_clips(
-    search: Option<String>,
-    state: State<AppState>,
-) -> Result<Vec<ClipItem>, String> {
+fn get_clips(search: Option<String>, state: State<AppState>) -> Result<Vec<ClipItem>, String> {
     let db = state.db.lock().map_err(|e| e.to_string())?;
 
     let query = match &search {
